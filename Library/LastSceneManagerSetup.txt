@@ -1,0 +1,4 @@
+sceneSetups:
+- path: "Assets/Scenes/Stra\xDFe_Oval_lang.unity"
+  isLoaded: 1
+  isActive: 1
