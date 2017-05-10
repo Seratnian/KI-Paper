@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class RundeFahren : MonoBehaviour {
+    public bool showDebugMessages = false;
 	public Transform Checkpoint;
 	public Transform[] checkpoints;
 	private int index=0;
@@ -16,7 +17,7 @@ public class RundeFahren : MonoBehaviour {
 	void Start () 
 	{
 		checkpoints = new Transform[Checkpoint.transform.childCount];
-		Debug.Log (Checkpoint.transform.childCount);	 
+        if (showDebugMessages) Debug.Log (Checkpoint.transform.childCount);	 
 		foreach (Transform child in Checkpoint) 
 		{	 
 			checkpoints [zähl] = child;
@@ -32,12 +33,12 @@ public class RundeFahren : MonoBehaviour {
 	{
 		if (checkpoints.Length == 0) 
 		{
-			Debug.Log("Keine Elemente");
+            if (showDebugMessages) Debug.Log("Keine Elemente");
 			return;
 		}
 
 		agent.destination = checkpoints[index].position;
-		Debug.Log (index);
+		if (showDebugMessages) Debug.Log (index);
 
 
 	}
