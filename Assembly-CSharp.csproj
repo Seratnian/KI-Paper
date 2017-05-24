@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{422486C4-AA4B-E167-D38E-977304E6C3BD}</ProjectGuid>
+    <ProjectGuid>{984C467D-1343-07BB-AB1A-8987937966D7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\MoveTo.cs" />
+     <Compile Include="Assets\Scripts\RundeFahren.cs" />
+     <Compile Include="Assets\Scripts\TrackValues.cs" />
      <Compile Include="Assets\Scripts\allwallwaypoint.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

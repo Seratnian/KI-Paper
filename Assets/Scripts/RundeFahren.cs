@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class RundeFahren : MonoBehaviour {
-    public bool showDebugMessages = false;
 	public Transform Checkpoint;
 	public Transform[] checkpoints;
 	private int index=0;
@@ -12,19 +11,21 @@ public class RundeFahren : MonoBehaviour {
 	public NavMeshAgent agent;
 	private bool ziel = false;
 	public float secs = 0.0f;
+	public int Collisionen = 0;
+	public bool bestrafen = false;
 
 	// Liste der Checkpoints wird inititalisiert
 	void Start () 
 	{
 		checkpoints = new Transform[Checkpoint.transform.childCount];
-        if (showDebugMessages) Debug.Log (Checkpoint.transform.childCount);	 
+		Debug.Log (Checkpoint.transform.childCount);	 
 		foreach (Transform child in Checkpoint) 
 		{	 
 			checkpoints [zähl] = child;
 			zähl++;
 		}
 		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
-		agent.autoBraking = false;
+		agent.autoBraking = true;
 		GotoNextPoint ();
 	}
 
@@ -33,19 +34,19 @@ public class RundeFahren : MonoBehaviour {
 	{
 		if (checkpoints.Length == 0) 
 		{
-            if (showDebugMessages) Debug.Log("Keine Elemente");
+			Debug.Log("Keine Elemente");
 			return;
 		}
 
 		agent.destination = checkpoints[index].position;
-		if (showDebugMessages) Debug.Log (index);
+		//Debug.Log (index);
 
 
 	}
 	void Update()
 	{
 		//Abfangen ob das Ziel erreicht wurde, wenn ja --> GoToNextPoint() aufrufen
-		if (agent.remainingDistance < 2f && !agent.pathPending) 
+		if (agent.remainingDistance < 6f && !agent.pathPending) 
 		{
 			index++;
 			//Check ob die Ziellinie durchlaufen wurde, wenn ja --> Zeit anhalten
@@ -68,6 +69,18 @@ public class RundeFahren : MonoBehaviour {
 			secs = secs + Time.deltaTime;
 		}
 
+	}
+
+	void OnCollisionEnter()
+	{
+		if (!ziel) 
+		{
+			Collisionen++;
+		}
+		if (bestrafen) 
+		{
+			agent.velocity = new Vector3 (0, 0, 0);
+		}
 	}
 
 

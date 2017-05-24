@@ -29,6 +29,8 @@ public class TrackValues : MonoBehaviour
     
     public bool trackCollisions = true;
     private string collisionName = "";
+	private int collisionx=0;
+	private int collisiony=0;
 
     public bool trackDistanceToObject = true;
     public GameObject walls = null;
@@ -46,16 +48,20 @@ public class TrackValues : MonoBehaviour
         {
             if (writeToFile)
             {
-                logFile = Application.dataPath.Replace("Assets", "") + "Logs/" + "log_" + now.ToString("yyyy'-'MM'-'dd HH'_'mm") + ".csv";
+				
+				logFile = Application.dataPath.Replace("Assets", "") + "Logs/" + "log_" + now.ToString("yyyy'-'MM'-'dd HH'_'mm'_'") +UnityEngine.Random.Range(0,10000)+".csv";
                 logFileStream = File.Create(logFile);
                 Write("sep=" + CSV_SEPARATOR);
                 List<string> titles = new List<string>();
                 titles.Add("Time");
                 titles.Add("x-Position");
                 titles.Add("y-Position");
-                if (trackSplitTimes) titles.Add("SplitTimes");
-                if (trackDistanceToObject) titles.Add("Distance");
-                if (trackCollisions) titles.Add("Collision");
+				//if (trackCollisions) titles.Add("Collision");
+                if (trackSplitTimes) titles.Add("Checkpoint");
+				if (trackCollisions) titles.Add("Collisionx");
+				if (trackCollisions) titles.Add("Collisiony");
+
+                
                 Write(separate(titles.ToArray()));
             }
             if (trackDistanceToObject)
@@ -88,7 +94,9 @@ public class TrackValues : MonoBehaviour
             Tracker tracker = new Tracker(Time.time, position, debug);
             if (trackSplitTimes) tracker.SplitTime = checkSplitTime();
             if (trackCollisions) tracker.Collision = checkCollision();
-            if (trackDistanceToObject) tracker.Distance = calculateDistance(position);
+			if (trackCollisions) tracker.Trackcollx= checkCollisionx();
+			if (trackCollisions) tracker.Trackcolly= checkCollisiony();
+           // if (trackDistanceToObject) tracker.Distance = calculateDistance(position);
             
             log(tracker.ToString());
         }
@@ -100,6 +108,20 @@ public class TrackValues : MonoBehaviour
         collisionName = "";
         return collision;
     }
+	private int checkCollisionx()
+	{
+		int collx = collisionx;
+		collisionx=0;
+		return collx;
+		
+	}
+	private int checkCollisiony()
+	{
+		int colly = collisiony;
+		collisiony=0;
+		return colly;
+
+	}
 
     private string checkSplitTime()
     {
@@ -107,7 +129,8 @@ public class TrackValues : MonoBehaviour
         {
             if (Vector3.Distance(this.transform.position, splitTimeTracker.position) <= DISTANCE_TO_TARGET)
             {
-                return splitTimeTracker.name;
+				Debug.Log (splitTimeTracker.name);
+				return splitTimeTracker.name;
             }
         }
         return "";
@@ -154,14 +177,24 @@ public class TrackValues : MonoBehaviour
         return positionToName((int) position.x, (int) position.y);
     }
 
+
     private Vector2 calculatePosition(Transform of)
     {
         Vector2 position = new Vector2();
-        position.x = (int)Math.Floor(of.position.x / sizeOfGround.x * discreteAreaInto) + discreteAreaInto / 2;
-        position.y = (int)Math.Floor(of.position.z / sizeOfGround.z * discreteAreaInto) + discreteAreaInto / 2;
+		position.x = (int)Math.Floor (of.position.x / sizeOfGround.x * discreteAreaInto);
+		position.y = (int)Math.Floor (of.position.z / sizeOfGround.z * discreteAreaInto);
         return position;
     }
-
+	public int collx(Transform of)
+	{
+		int positionx = (int)Math.Floor (of.position.x / sizeOfGround.x * discreteAreaInto);
+		return positionx;
+	}
+	public int colly(Transform of)
+	{
+		int positiony = (int)Math.Floor (of.position.z / sizeOfGround.z * discreteAreaInto);
+		return positiony;
+	}
     // Update is called once per frame
     void Update()
     {
@@ -191,7 +224,7 @@ public class TrackValues : MonoBehaviour
                 }
             }
 
-            if (trackDistanceToObject)
+            /*if (trackDistanceToObject)
             {
                 if (Time.time - timeOfLastDistanceTrack >= everyYSeconds)
                 {
@@ -199,10 +232,10 @@ public class TrackValues : MonoBehaviour
                     foreach (GameObject target in distanceTo)
                     {
                         Vector3 distance = calculateDistance(gameObject, target);
-                        log("distance", distance.x, distance.y, distance.z);
+                        Debug.Log(distance.x+" "+distance.y+" "+distance.z);
                     }
                 }
-            }
+            }*/
             if (trackCollisions && collisionName != "")
             {
                 log("Collision", collisionName);
@@ -231,7 +264,10 @@ public class TrackValues : MonoBehaviour
     {
         if (trackCollisions)
         {
+			collisionx = collx (collision.transform);
+			collisiony = colly (collision.transform);
             collisionName = collision.collider.name;
+			//Debug.Log ("Collision");
         }
     }
 
@@ -304,14 +340,18 @@ class Tracker
     private float distance;
     private string collision;
     private string splitTime;
+	private int trackcollx;
+	private int trackcolly;
 
-    public Tracker(float time, Vector2 position, bool debug, float distance = float.MaxValue, string collision = null, string splitTime = null)
+	public Tracker(float time, Vector2 position, bool debug, float distance = float.MaxValue, string collision = null, string splitTime = null)
     {
         this.time = time;
         this.position = position;
         this.debug = debug;
         this.distance = distance;
         this.collision = collision;
+		this.trackcollx = trackcollx;
+		this.trackcolly = trackcolly;
         this.splitTime = splitTime;
     }
     public Tracker(float time, Vector2 position, float distance = float.MaxValue, string collision = null, string splitTime = null)
@@ -332,6 +372,20 @@ class Tracker
             collision = value;
         }
     }
+	public int Trackcollx
+	{
+		set
+		{
+			trackcollx = value;
+		}
+	}
+	public int Trackcolly
+	{
+		set
+		{
+			trackcolly = value;
+		}
+	}
 
     public string SplitTime
     {
@@ -346,9 +400,10 @@ class Tracker
         List<string> strings = new List<string>();
         strings.Add((debug ? "Time: " : "") + time);
         strings.Add((debug ? "Position: " : "") + TrackValues.separate(position.x.ToString(), position.y.ToString()));
-        if (distance < float.MaxValue) strings.Add((debug ? "Distance: " : "") + distance);
-        if (collision != null) strings.Add((debug ? "Collision: " : "") + collision);
+ //       if (collision != null) strings.Add((debug ? "Collision: " : "") + collision);
         if (splitTime != null) strings.Add((debug ? "splitTime: " : "") + splitTime);
+		strings.Add((debug ? "Collisionx: " : "") + trackcollx);
+		strings.Add((debug ? "Collisiony: " : "") + trackcolly);
         return TrackValues.separate(strings.ToArray());
     }
 }
