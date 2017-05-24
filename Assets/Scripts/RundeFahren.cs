@@ -18,7 +18,7 @@ public class RundeFahren : MonoBehaviour {
 	void Start () 
 	{
 		checkpoints = new Transform[Checkpoint.transform.childCount];
-		Debug.Log (Checkpoint.transform.childCount);	 
+		//Debug.Log (Checkpoint.transform.childCount);	 
 		foreach (Transform child in Checkpoint) 
 		{	 
 			checkpoints [zähl] = child;
@@ -32,13 +32,9 @@ public class RundeFahren : MonoBehaviour {
 	//Funktion zum übergeben des nächsten Ziels
 	void GotoNextPoint()
 	{
-		if (checkpoints.Length == 0) 
-		{
-			Debug.Log("Keine Elemente");
-			return;
-		}
+		
 
-		agent.destination = checkpoints[index].position;
+		agent.destination = Checkpoint.position;
 		//Debug.Log (index);
 
 
